@@ -1,29 +1,60 @@
 <?php
-require '../../config/koneksi.php'; // koneksi mysql_connect
+require '../../config/koneksi.php';
 
 $jenis = isset($_GET['jenis']) ? $_GET['jenis'] : '';
+$keyword = isset($_GET['q']) ? trim($_GET['q']) : '';
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
-$sql = mysql_query("
-        SELECT
-            nik,
-            npwp,
-            nama,
-            tempat_lahir,
-            tanggal_lahir,
-            alamat,
-            no_hp,
-            jenis_kelamin,
-            nama_usaha,
-            bidang_usaha,
-            alamat_kantor,
-            hp_pic
-        FROM nasabah
-        ORDER BY nama ASC
-    ");
+if ($page < 1) $page = 1;
+
+$limit = 4; // tampilkan 20 data saja
+$offset = ($page - 1) * $limit;
+
+$keyword = mysql_real_escape_string($keyword);
 
 if ($jenis == 'perorangan') {
 
-    $no = 1;
+    $where = "";
+
+    if ($keyword != '') {
+        $where = "WHERE nama LIKE '%$keyword%'
+                  OR nik LIKE '%$keyword%'
+                  OR npwp LIKE '%$keyword%'";
+    }
+
+    $sql = mysql_query("
+        SELECT
+            nik, npwp, nama, tempat_lahir, tanggal_lahir,
+            alamat, no_hp, jenis_kelamin
+        FROM nasabah
+        $where
+        ORDER BY nama ASC
+        LIMIT $offset, $limit
+    ");
+
+} else {
+
+    $where = "";
+
+    if ($keyword != '') {
+        $where = "WHERE nama_usaha LIKE '%$keyword%'
+                  OR npwp LIKE '%$keyword%'";
+    }
+
+    $sql = mysql_query("
+        SELECT
+            nama, npwp, nama_usaha,
+            bidang_usaha, alamat_kantor, hp_pic
+        FROM nasabah
+        $where
+        ORDER BY nama_usaha ASC
+        LIMIT $offset, $limit
+    ");
+}
+
+if ($jenis == 'perorangan') {
+
+    $no = $offset + 1;
 
     while ($r = mysql_fetch_assoc($sql)) {
         ?>
@@ -52,7 +83,7 @@ if ($jenis == 'perorangan') {
 
 } elseif ($jenis == 'badan_usaha') {
 
-    $no = 1;
+    $no = $offset + 1;
 
     while ($r = mysql_fetch_assoc($sql)) {
         ?>

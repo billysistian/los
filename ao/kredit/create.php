@@ -910,34 +910,42 @@ require_role('AO');
     </div>
 
     <div class="modal fade" id="modalNasabah" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Pilih Data Nasabah</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Pilih Data Nasabah</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
 
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table id="table" class="table table-striped table-bordered nowrap">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>NIK / NPWP</th>
-                                <th>Nama</th>
-                                <th>Alamat</th>
-                                <th width="100">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelNasabah">
-                            <!-- isi ajax -->
-                        </tbody>
-                    </table>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <input type="text"
+                                id="cariNasabah"
+                                class="form-control"
+                                placeholder="Cari nama / NIK / NPWP...">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered nowrap">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>NIK / NPWP</th>
+                                    <th>Nama</th>
+                                    <th>Alamat</th>
+                                    <th width="100">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelNasabah">
+                                <!-- isi ajax -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 <?php include "../layout/footer.php"; ?>
 <script>
@@ -1114,6 +1122,32 @@ $(document).on('click', '.pilih-nasabah', function(){
     }
 
     $('#modalNasabah').modal('hide');
+});
+
+function loadNasabah(page){
+    $.get('ajax_nasabah.php', {
+        jenis: $('#jenis').val(),
+        q: $('#cariNasabah').val(),
+        page: page || 1
+    }, function(res){
+        $('#tabelNasabah').html(res);
+    });
+}
+
+// buka modal
+$('#btnPilihNasabah').click(function(){
+    $('#modalNasabah').modal('show');
+    loadNasabah(1);
+});
+
+// pencarian dengan delay
+let timer;
+$('#cariNasabah').on('keyup', function(){
+    clearTimeout(timer);
+
+    timer = setTimeout(function(){
+        loadNasabah(1);
+    }, 300);
 });
 });
 </script>
