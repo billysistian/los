@@ -22,7 +22,7 @@ if (mysql_num_rows($result) > 0) {
     $_SESSION['status'] = "login";
     $_SESSION['role'] = $user_data['role'];
 
-    $redirect_url = "../admin/dashboard/index.php";
+    $redirect_url = "../ao/dashboard/index.php";
 
     // Mengisi respon sukses
     $response = array(
